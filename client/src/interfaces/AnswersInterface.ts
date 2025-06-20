@@ -1,4 +1,4 @@
 export interface AnswersInterface {
-    title: string;
-    score: number;
+    text: string;
+    id: number;
 }

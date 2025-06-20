@@ -1,5 +1,8 @@
+import {AnswersInterface} from "@/interfaces/AnswersInterface";
+
 export interface QuestionInterface {
-    question: string;
-    category: 'Realistic' | 'Investigative' | 'Artistic' | 'Social' | 'Enterprising' | 'Conventional';
+    text: string;
+    category: 'R' | 'I' | 'A' | 'S' | 'E' | 'C';
     id: number;
+    options: AnswersInterface[]
 }

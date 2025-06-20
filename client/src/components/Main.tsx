@@ -1,41 +1,52 @@
+'use client'
+
+import {useEffect, useState} from "react";
+import {getQuestionById, getQuestionsCount} from "@/lib/api";
 import Card from "@/components/Card/Card";
-import {getAllQuestions} from "@/lib/db";
 import {QuestionInterface} from "@/interfaces/QuestionInterface";
-import {JSX} from "react";
-import {AnswersInterface} from "@/interfaces/AnswersInterface";
+import {useRouter} from "next/navigation";
 
+export default function Main() {
+    const [question, setQuestion] = useState<QuestionInterface>();
+    const [questIndex, setQuestIndex] = useState<number>(1);
+    const [total, setTotal] = useState<number>(2);
 
+    const router = useRouter();
+    const fetchQuestion = async () => {
+        const data = await getQuestionById(questIndex);
+        setQuestion(data);
+    };
+    useEffect(() => {
+        const fetchTotal = async () => {
+            const total = await getQuestionsCount();
+            setTotal(total);
+        };
+        fetchTotal();
+        fetchQuestion()
+    }, []);
 
-export default async function Main() {
+    useEffect(() => {
 
-    const questions: QuestionInterface[] = await getAllQuestions();
-
-    const answers: AnswersInterface[] = [
-        {
-            title: 'Совершенно верно',
-            score: 4
-        },
-        {
-            title: 'Верно',
-            score: 3
-        },
-        {
-            title: 'Скорее не так',
-            score: 2
-        },
-        {
-            title: 'Нет, это не так',
-            score: 1
+        console.log(questIndex)
+        if (questIndex < total) {
+           fetchQuestion();
+        } else {
+            router.push('/results');
         }
-    ]
+    }, [questIndex, total]);
+
 
     return (
         <main className='flex items-center justify-center min-h-[90vh]'>
-            {questions.map((question: QuestionInterface, index: number): JSX.Element => (
-                    <Card question={question.question} answers={answers} total={questions.length + 1} index={index + 1}
-                          key={index}/>
-                )
-            )}
+            {question &&
+                <Card
+                    question={question.text}
+                    answers={question.options}
+                    total={total}
+                    index={questIndex}
+                    nextFunction={() => setQuestIndex(prev => prev + 1)}
+                />
+            }
         </main>
     );
 }
