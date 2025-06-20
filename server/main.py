@@ -10,10 +10,11 @@ import json
 
 app = FastAPI()
 
+print(__file__)
 # Разрешаем CORS (например, для доступа с фронта)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ← в проде укажи домен фронта
+    allow_origins=["*"],  # ← в проде указать домен фронта
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +32,23 @@ def get_questions(limit: int = None, db: Session = Depends(get_db)):
     query = db.query(Question)
     if limit:
         query = query.limit(limit)
-    return query.all()
+    questions = query.all()
+
+    result = []
+    for q in questions:
+        result.append({
+            "id": q.id,
+            "text": q.text,
+            "category": q.category,
+            "options": [
+                {
+                    "id": opt.id,
+                    "text": opt.text,
+                }
+                for opt in q.options
+            ]
+        })
+    return result
 
 @app.post("/answer")
 def save_answer(session_id: str, question_id: int, option_id: int, db: Session = Depends(get_db)):

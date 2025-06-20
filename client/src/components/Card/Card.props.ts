@@ -6,4 +6,5 @@ export interface CardProps extends DetailsHTMLAttributes<HTMLDivElement> {
     answers: AnswersInterface[];
     index: number;
     total: number;
+    nextFunction: () => void;
 }
